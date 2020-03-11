@@ -36,6 +36,7 @@ route.get('/cv/:id', async (req, res) => {
 route.post('/cv', async (req, res) => {
 	const newCV = req.body;
 	const email = req.body.email;
+	
 	try {
 		const isExist = await CV.findOne({ email });
 		if(isExist){
@@ -74,14 +75,13 @@ route.post('/cvs', async (req, res) => {
 });
 route.put('/cv', async (req, res) => {
 	const updatedObj = req.body;
-	const id = req.body._id;
+	const email = req.query.email;
+	const cgpa = req.body.cv['education']['pg']['cgpa'];
 	try {
-		const cv = await CV.findByIdAndUpdate({_id:id},updatedObj);
-		if(cv){
-			return res.status(200).json({ success: true})
-		}else{
-			return res.status(500).json({ success: false, msg: "Something went wrong"})
-		}
+		let cv = await CV.update({email: email},{$set:{ "cv.education.pg.0.cgpa": cgpa}});
+
+		return res.status(200).json({ success: true });
+		
         
 	} catch (error) {
 		console.error(error);
@@ -137,7 +137,7 @@ route.delete('/cvs', async (req, res) => {
 	}
 });
 route.get('/cvs', async (req, res) => {
-	const id = req.params.id;
+	// const id = req.params.id;
 	try {
 		const cv = await CV.find({});
 
@@ -151,4 +151,5 @@ route.get('/cvs', async (req, res) => {
 		return res.status(400).json({ success: false, msg: 'Something went wrong' });
 	}
 });
+
 module.exports = route;
